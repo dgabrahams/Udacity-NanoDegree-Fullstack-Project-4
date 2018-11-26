@@ -1,0 +1,28 @@
+{% extends "main.html" %}
+{% block content_area %}
+<div class="container">
+
+	<div class="banner main">
+		<div class="col-md-12 background_white">
+			<h3>{{stockItem[0].name}}</h3>
+
+			<p>{{stockItem[0].description}}</p>
+
+		</div>
+		<div class="clearfix"></div>
+
+		{% if loginStatus['loginStatus'] %}
+			{% print 'from template, user is logged in' %}
+			<a href = "{{url_for('newStockItem', category_id = currentCategory.id)}}">
+				Add item
+			</a>
+			|
+			<a href = "{{url_for('newStockItem', category_id = currentCategory.id)}}">
+				Add item
+			</a>
+		{% endif %}
+
+	</div>
+
+</div>
+{% endblock %}

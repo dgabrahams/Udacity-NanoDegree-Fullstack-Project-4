@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content_area %}
+<div class="container">
+
+	<div class="banner main background_white">
+		<div class="col-md-4">
+			<h3>Categories</h3>
+
+			{% for category in categories %}
+				<a href = "{{url_for('showCategoryItems', category_id = category.id)}}">
+					{{category.name}}
+				</a>
+			{% endfor %}
+
+		</div>
+		<div class="col-md-8">
+
+			{% if loginStatus %}
+				{% print 'from template, user is logged in' %}
+				<a href = "{{url_for('newStockItem', category_id = 0)}}">
+					Add Item
+				</a>
+			{% endif %}
+
+			<h3>Latest Items</h3>
+
+			{% for singleItem in stockItem %}
+				<a href = "{{url_for('showStockItem', category_id = singleItem.category.id, stockItem_id = singleItem.id)}}">
+					{{singleItem.name}} <span>({{singleItem.category.name}})</span>
+				</a>
+			{% endfor %}
+
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+
+</div>
+{% endblock %}
