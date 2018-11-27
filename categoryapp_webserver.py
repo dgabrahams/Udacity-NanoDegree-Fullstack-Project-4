@@ -233,7 +233,7 @@ def categoriesJSON():
 
 
 # Show all categories
-@app.route('/category/')
+@app.route('/catalog/')
 def showCategories():
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -250,7 +250,7 @@ def showCategories():
 
 
 # Create a new category
-@app.route('/category/new/', methods=['GET', 'POST'])
+@app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCategory():
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -269,7 +269,7 @@ def newCategory():
         return render_template('newCategory.html')
 
 # Edit a category
-@app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -290,7 +290,7 @@ def editCategory(category_id):
 
 
 # Delete a category
-@app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -310,8 +310,8 @@ def deleteCategory(category_id):
         return render_template('deleteCategory.html', category=categoryToDelete)
 
 # Show items that belong to a category
-@app.route('/category/<int:category_id>/')
-@app.route('/category/<int:category_id>/items/')
+@app.route('/catalog/<int:category_id>/')
+@app.route('/catalog/<int:category_id>/items/')
 def showCategoryItems(category_id):
 
     DBSession = sessionmaker(bind=engine)
@@ -329,7 +329,7 @@ def showCategoryItems(category_id):
 
 
 # Show a category item
-@app.route('/category/<int:category_id>/<int:stockItem_id>')
+@app.route('/catalog/<int:category_id>/<int:stockItem_id>')
 def showStockItem(category_id, stockItem_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -345,8 +345,9 @@ def showStockItem(category_id, stockItem_id):
 
 
 # Create a new stock item
-@app.route('/category/<int:category_id>/items/new/', methods=['GET', 'POST'])
-def newStockItem(category_id):
+@app.route('/catalog/items/new/', methods=['GET', 'POST'])
+# def newStockItem(category_id):
+def newStockItem():
     # Check the user is logged in to access this page
     if 'username' not in login_session:
         return login_required_message
@@ -356,26 +357,33 @@ def newStockItem(category_id):
 
     # category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
-        category = session.query(Category).filter_by(id=category_id).one()
-        # newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category_id)
-        newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category)
-        session.add(newItem)
-        session.commit()
+        if request.form['select_value']:
+            category_id = request.form['select_value']
 
-        # FLASH MESSGE!
-        flash('New Menu %s Item Successfully Created' % (newItem.name))
+            print category_id
 
-        return redirect(url_for('showCategoryItems', category_id=category_id))
+            category = session.query(Category).filter_by(id=int(category_id)).one()
+            # newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category_id)
+            newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category)
+            session.add(newItem)
+            session.commit()
+
+            # FLASH MESSGE!
+            flash('New Menu %s Item Successfully Created' % (newItem.name))
+
+            return redirect(url_for('showCategoryItems', category_id=category_id))
+        else:
+            return "sorry"
     else:
         categories = session.query(Category).all()
-        return render_template('newStockItem.html', category_id=category_id, categories=categories)
+        return render_template('newStockItem.html', categories=categories)
 
 
 
 
 
 # Edit a stock item
-@app.route('/category/<int:category_id>/items/<int:stock_id>/edit', methods=['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/items/<int:stock_id>/edit', methods=['GET', 'POST'])
 def editStockItem(category_id, stock_id):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -403,7 +411,7 @@ def editStockItem(category_id, stock_id):
         return render_template('editstockitem.html', category_id=category_id, stock_id=stock_id, item=editedItem)
 
 # Delete a stock item
-@app.route('/category/<int:category_id>/items/<int:stock_id>/delete', methods=['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/items/<int:stock_id>/delete', methods=['GET', 'POST'])
 def deleteStockItem(category_id, stock_id):
     # Check the user is logged in to access this page
     if 'username' not in login_session:

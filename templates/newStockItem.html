@@ -6,32 +6,23 @@
 		<div class="col-md-12">
 			<h3>Add Item</h3>
 
-			<form action="{{url_for('newStockItem', category_id = category_id)}}" method="POST">
-			  Item Name:<br>
-			  <input type="text" name="name"><br>
-			  Item Description:<br>
+			<form action="{{url_for('newStockItem', category_id = category_id)}}" method="POST" class="add-item-form">
+			  <span>Title:</span>
+			  <input type="text" name="name">
+			  <span>Description:</span>
 			  <input type="text" name="description">
-			  <input type="submit" value="Submit">
-			</form>
-
-
-			{% for category in categories %}
-				<a href = "{{url_for('showCategoryItems', category_id = category.id)}}">
-					{{category.name}}
-				</a>
-
-				<select>
-					{% for singleItem in stockItem %}
-						<option value="{category.name}}">{{category.name}}</option>
+			  <span>Category:</span>
+				<select name="select_value">
+					{% for category in categories %}
+								<option value="{{category.id}}">{{category.name}}</option>
 					{% endfor %}
 				</select>
-			{% endfor %}
-
+			  <input type="submit" value="Submit" class="add-submit-button">
+			</form>
 
 		</div>
 		<div class="clearfix"></div>
 	</div>
-
 
 </div>
 {% endblock %}

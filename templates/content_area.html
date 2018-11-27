@@ -7,7 +7,7 @@
 			<h3>Categories</h3>
 
 			{% for category in categories %}
-				<a href = "{{url_for('showCategoryItems', category_id = category.id)}}">
+				<a href = "{{url_for('showCategoryItems', category_name = category.name)}}">
 					{{category.name}}
 				</a>
 			{% endfor %}
@@ -25,7 +25,7 @@
 			<h3>Latest Items</h3>
 
 			{% for singleItem in stockItem %}
-				<a href = "{{url_for('showStockItem', category_id = singleItem.category.id, stockItem_id = singleItem.id)}}">
+				<a href = "{{url_for('showStockItem', category_name = singleItem.category.name, stockItem_id = singleItem.id)}}">
 					{{singleItem.name}} <span>({{singleItem.category.name}})</span>
 				</a>
 			{% endfor %}

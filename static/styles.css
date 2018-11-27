@@ -198,3 +198,17 @@ a {
 	color: #c64f17;
 }
 
+.add-item-form input,
+.add-item-form select,
+.add-item-form span {
+	display: block;
+}
+
+.add-item-form span,
+.add-submit-button {
+	margin: 20px 0 0 0;
+}
+
+
+
+
