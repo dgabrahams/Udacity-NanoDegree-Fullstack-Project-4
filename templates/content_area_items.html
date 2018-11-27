@@ -7,7 +7,7 @@
 			<h3>Categories</h3>
 
 			{% for category in categories %}
-				<a href = "{{url_for('showCategoryItems', category_id = category.id)}}">
+				<a href = "{{url_for('showCategoryItems', category_name = category.name)}}">
 					{{category.name}}
 				</a>
 			{% endfor %}
@@ -19,13 +19,13 @@
 
 			{% if loginStatus['loginStatus'] %}
 				{% print 'from template, user is logged in' %}
-				<a href = "{{url_for('newStockItem', category_id = currentCategory.id)}}">
+				<a href = "{{url_for('newStockItem', category_name = currentCategory.name)}}">
 					Add item
 				</a>
 			{% endif %}
 
 			{% for singleItem in stockItems %}
-				<a href = "{{url_for('showStockItem', category_id = currentCategory.id, stockItem_id = singleItem.id)}}">
+				<a href = "{{url_for('showStockItem', category_name = currentCategory.name, stockItem_name = singleItem.name)}}">
 					{{singleItem.name}} <span>({{singleItem.category.name}})</span>
 				</a>
 			{% endfor %}
