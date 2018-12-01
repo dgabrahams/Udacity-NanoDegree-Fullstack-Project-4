@@ -1,0 +1,31 @@
+{% extends "main.html" %}
+{% block content_area %}
+<div class="container">
+
+	<div class="banner main background_white">
+		<div class="col-md-12">
+			<h3>Edit Item</h3>
+			<form action="{{url_for('editStockItem', category_name=category_name, stock_name=stock_name)}}" method="POST" class="add-item-form">
+			  <span>Title:</span>
+			  <input type="text" name="name" value="{{stock_item.name}}">
+			  <span>Description:</span>
+			  <textarea maxlength="250" rows="3" name="description">{{stock_item.description}}</textarea>
+			  <span>Category:</span>
+				<select name="select_value">
+					{% for category in categories %}
+						{% if category.name == stock_item.category_name %}
+							<option value="{{category.name}}" selected="selected">{{category.name}}</option>
+						{% else %}
+							<option value="{{category.name}}">{{category.name}}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			  <input type="submit" value="Submit" class="add-submit-button">
+			</form>
+
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+</div>
+{% endblock %}

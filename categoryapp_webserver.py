@@ -238,6 +238,9 @@ def showCategories():
     # Check the user is logged in to access this page
     if 'username' not in login_session:
         return login_required_message
+
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     categories = session.query(Category).order_by(asc(Category.name))
     # currentCategory = session.query(Category).filter_by(name=category_name).one()
 
@@ -269,7 +272,7 @@ def newCategory():
         return render_template('newCategory.html')
 
 # Edit a category
-@app.route('/catalog/<string:category_name>/edit/', methods=['GET', 'POST'])
+@app.route('/catalog/edit/<string:category_name>', methods=['GET', 'POST'])
 def editCategory(category_name):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -290,7 +293,7 @@ def editCategory(category_name):
 
 
 # Delete a category
-@app.route('/catalog/<string:category_name>/delete/', methods=['GET', 'POST'])
+@app.route('/catalog/delete/<string:category_name>', methods=['GET', 'POST'])
 def deleteCategory(category_name):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -338,7 +341,7 @@ def showStockItem(category_name, stockItem_name):
     currentCategory = session.query(Category).filter_by(name=category_name).one()
     loginStatus = templateLoginStatus()
     # print stockItem[0].name
-    return render_template('item_content.html', stockItem=stockItem, loginStatus = loginStatus, currentCategory=currentCategory)
+    return render_template('item_content.html', stockItem=stockItem, loginStatus=loginStatus, currentCategory=currentCategory)
 
 
 
@@ -360,9 +363,10 @@ def newStockItem():
         if request.form['select_value']:
             category_name = request.form['select_value']
 
+            print "cat name:"
             print category_name
 
-            category = session.query(Category).filter_by(name=int(category_name)).one()
+            category = session.query(Category).filter_by(name=category_name).one()
             # newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category_name)
             newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category)
             session.add(newItem)
@@ -383,8 +387,8 @@ def newStockItem():
 
 
 # Edit a stock item
-@app.route('/catalog/<string:category_name>/items/<string:stock_name>/edit', methods=['GET', 'POST'])
-def editStockItem(category_name, stock_name):
+@app.route('/catalog/<string:stock_name>/edit', methods=['GET', 'POST'])
+def editStockItem(stock_name):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
         return login_required_message
@@ -393,26 +397,27 @@ def editStockItem(category_name, stock_name):
     session = DBSession()
 
     editedItem = session.query(StockItem).filter_by(name=stock_name).one()
-    category = session.query(Category).filter_by(name=category_name).one()
+    category = session.query(Category).filter_by(name=editedItem.category_name).one()
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
         if request.form['description']:
             editedItem.description = request.form['description']
-        if request.form['price']:
-            editedItem.price = request.form['price']
-        if request.form['course']:
-            editedItem.course = request.form['course']
+        if request.form['select_value']:
+            editedItem.price = request.form['select_value']
         session.add(editedItem)
         session.commit()
-        flash('Menu Item Successfully Edited')
-        return redirect(url_for('showCategoryItems', category_name=category_name))
+        # flash('Menu Item Successfully Edited')
+        return redirect(url_for('showCategoryItems', category_name=editedItem.category_name))
     else:
-        return render_template('editstockitem.html', category_name=category_name, stock_name=stock_name, item=editedItem)
+        # categories = session.query(Category).filter_by(name=category_name).one()
+        categories = session.query(Category).all()
+        return render_template('editStockitem.html', stock_name=stock_name, stock_item=editedItem, categories=categories)
+
 
 # Delete a stock item
-@app.route('/catalog/<string:category_name>/items/<string:stock_name>/delete', methods=['GET', 'POST'])
-def deleteStockItem(category_name, stock_name):
+@app.route('/catalog/<string:stock_name>/delete', methods=['GET', 'POST'])
+def deleteStockItem(stock_name):
     # Check the user is logged in to access this page
     if 'username' not in login_session:
         return login_required_message
@@ -420,15 +425,18 @@ def deleteStockItem(category_name, stock_name):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    category = session.query(Category).filter_by(name=category_name).one()
+    # category = session.query(Category).filter_by(name=category_name).one()
     itemToDelete = session.query(StockItem).filter_by(name=stock_name).one()
+    # category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
-        flash('Menu Item Successfully Deleted')
-        return redirect(url_for('showCategoryItems', category_name=category_name))
+        print "deleted!"
+        # flash('Menu Item Successfully Deleted')
+        category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
+        return redirect(url_for('showCategoryItems', category_name=itemToDelete.category_name))
     else:
-        return render_template('deleteStockItem.html', item=itemToDelete)
+        return render_template('deleteStockItem.html', stock_name=stock_name)
 
 
 if __name__ == '__main__':

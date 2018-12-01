@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+{% block content_area %}
+<div class="container">
+
+	<div class="banner main background_white">
+		<div class="col-md-12">
+			<h3>Categories</h3>
+
+			{% for category in categories %}
+				<a href = "{{url_for('showCategoryItems', category_name = category.name)}}">
+					{{category.name}}
+				</a>
+			{% endfor %}
+
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+
+</div>
+{% endblock %}

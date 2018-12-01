@@ -17,7 +17,7 @@
 
 			{% if loginStatus %}
 				{% print 'from template, user is logged in' %}
-				<a href = "{{url_for('newStockItem', category_id = 0)}}">
+				<a href = "{{url_for('newStockItem')}}">
 					Add Item
 				</a>
 			{% endif %}
@@ -25,7 +25,7 @@
 			<h3>Latest Items</h3>
 
 			{% for singleItem in stockItem %}
-				<a href = "{{url_for('showStockItem', category_name = singleItem.category.name, stockItem_id = singleItem.id)}}">
+				<a href = "{{url_for('showStockItem', category_name = singleItem.category.name, stockItem_name = singleItem.name)}}">
 					{{singleItem.name}} <span>({{singleItem.category.name}})</span>
 				</a>
 			{% endfor %}

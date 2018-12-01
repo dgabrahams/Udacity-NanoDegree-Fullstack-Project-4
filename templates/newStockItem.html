@@ -6,7 +6,7 @@
 		<div class="col-md-12">
 			<h3>Add Item</h3>
 
-			<form action="{{url_for('newStockItem', category_id = category_id)}}" method="POST" class="add-item-form">
+			<form action="{{url_for('newStockItem', category_name = category_name)}}" method="POST" class="add-item-form">
 			  <span>Title:</span>
 			  <input type="text" name="name">
 			  <span>Description:</span>
@@ -14,7 +14,7 @@
 			  <span>Category:</span>
 				<select name="select_value">
 					{% for category in categories %}
-								<option value="{{category.id}}">{{category.name}}</option>
+								<option value="{{category.name}}">{{category.name}}</option>
 					{% endfor %}
 				</select>
 			  <input type="submit" value="Submit" class="add-submit-button">

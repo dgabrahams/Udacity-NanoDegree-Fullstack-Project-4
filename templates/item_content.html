@@ -10,15 +10,15 @@
 
 		</div>
 		<div class="clearfix"></div>
-
+		
 		{% if loginStatus['loginStatus'] %}
 			{% print 'from template, user is logged in' %}
-			<a href = "{{url_for('newStockItem', category_id = currentCategory.id)}}">
-				Add item
+			<a href = "{{url_for('editStockItem', stock_name=stockItem[0].name)}}">
+				Edit
 			</a>
 			|
-			<a href = "{{url_for('newStockItem', category_id = currentCategory.id)}}">
-				Add item
+			<a href = "{{url_for('deleteStockItem', stock_name=stockItem[0].name)}}">
+				Delete
 			</a>
 		{% endif %}
 

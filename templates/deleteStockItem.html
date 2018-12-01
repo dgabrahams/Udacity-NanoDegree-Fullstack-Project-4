@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% block content_area %}
+<div class="container">
+
+	<div class="banner main background_white">
+		<div class="col-md-12">
+			<h3>Delete Item</h3>
+			<p>Are you sure you want to delete this item?</p>
+			<form action="{{url_for('deleteStockItem', stock_name=stock_name)}}" method="POST" class="add-item-form">
+			  <input type="text" name="delete" value="true" style="display:none;visibility:hidden;">
+			  <input type="submit" value="Submit" class="add-submit-button">
+			</form>
+
+		</div>
+		<div class="clearfix"></div>
+	</div>
+
+</div>
+{% endblock %}
