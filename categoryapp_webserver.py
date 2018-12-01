@@ -203,31 +203,25 @@ def showLandingPage():
 
 
 
-
-
-#category = category
-#categories = categories - do this one first
-
-
-
-
 # JSON APIs to view Category Information
-@app.route('/catalog/<string:category_name>/items/JSON')
-def categoryMenuJSON(category_name):
-    category = session.query(Category).filter_by(name=category_name).one()
-    items = session.query(StockItem).filter_by(
-        category_name=category_name).all()
-    return jsonify(StockItems=[i.serialize for i in items])
+# @app.route('/catalog/<string:category_name>/items/JSON')
+# def categoryMenuJSON(category_name):
+#     category = session.query(Category).filter_by(name=category_name).one()
+#     items = session.query(StockItem).filter_by(
+#         category_name=category_name).all()
+#     return jsonify(StockItems=[i.serialize for i in items])
 
 
-@app.route('/catalog/<string:category_name>/items/<string:stock_name>/JSON')
-def stockItemJSON(category_name, stock_name):
-    Menu_Item = session.query(StockItem).filter_by(name=stock_name).one()
-    return jsonify(Menu_Item=Menu_Item.serialize)
+# @app.route('/catalog/<string:category_name>/items/<string:stock_name>/JSON')
+# def stockItemJSON(category_name, stock_name):
+#     Menu_Item = session.query(StockItem).filter_by(name=stock_name).one()
+#     return jsonify(Menu_Item=Menu_Item.serialize)
 
 
 @app.route('/catalog/JSON')
 def categoriesJSON():
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     categories = session.query(Category).all()
     return jsonify(categories=[r.serialize for r in categories])
 
