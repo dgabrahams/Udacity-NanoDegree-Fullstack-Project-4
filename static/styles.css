@@ -218,12 +218,24 @@ a {
 
 .login-container {
 	margin-top: 1em;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.title-container {
+	display: inline-block;
+	vertical-align: middle;
 }
 
 #result {
 	display: inline-block;
   vertical-align: middle;
   padding: 0 1em 0 0;
+}
+
+#signinButton {
+	display: inline-block;
+  vertical-align: middle;
 }
 
 .signin-button {
