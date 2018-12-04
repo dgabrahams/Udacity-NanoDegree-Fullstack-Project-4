@@ -213,67 +213,6 @@ def showCategories():
     return render_template('categories.html', categories=categories)
 
 
-# Create a new category
-@app.route('/catalog/new/', methods=['GET', 'POST'])
-def newCategory():
-    # Check the user is logged in to access this page
-    if 'username' not in login_session:
-        return login_required_message
-
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-
-    if request.method == 'POST':
-        newCategory = Category(name=request.form['name'])
-        session.add(newCategory)
-        flash('New Category %s Successfully Created' % newCategory.name)
-        session.commit()
-        return redirect(url_for('showCategories'))
-    else:
-        return render_template('newCategory.html')
-
-# Edit a category
-@app.route('/catalog/edit/<string:category_name>', methods=['GET', 'POST'])
-def editCategory(category_name):
-    # Check the user is logged in to access this page
-    if 'username' not in login_session:
-        return login_required_message
-
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-
-    editedCategory = session.query(
-        Category).filter_by(name=category_name).one()
-    if request.method == 'POST':
-        if request.form['name']:
-            editedCategory.name = request.form['name']
-            flash('Category Successfully Edited %s' % editedCategory.name)
-            return redirect(url_for('showCategories'))
-    else:
-        return render_template('editCategory.html', category=editedCategory)
-
-
-# Delete a category
-@app.route('/catalog/delete/<string:category_name>', methods=['GET', 'POST'])
-def deleteCategory(category_name):
-    # Check the user is logged in to access this page
-    if 'username' not in login_session:
-        return login_required_message
-
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-
-    categoryToDelete = session.query(
-        Category).filter_by(name=category_name).one()
-    if request.method == 'POST':
-        session.delete(categoryToDelete)
-        flash('%s Successfully Deleted' % categoryToDelete.name)
-        session.commit()
-        return redirect(url_for('showCategories', category_name=category_name))
-    else:
-        return render_template('deleteCategory.html', category=categoryToDelete)
-
-
 # Show items that belong to a category
 @app.route('/catalog/<string:category_name>/')
 @app.route('/catalog/<string:category_name>/items/')
