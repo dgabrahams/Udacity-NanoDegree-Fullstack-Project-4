@@ -66,7 +66,7 @@ Resolving deltas: 100% (377/377), done.
 Checking out files: 100% (2128/2128), done.
 ```
 
-Navigate into the newly created 'ud036_StarterCode' folder:
+Navigate into the newly created 'Udacity-NanoDegree-Fullstack-Project-4' folder:
 ```
 cd Udacity-NanoDegree-Fullstack-Project-4
 ```
