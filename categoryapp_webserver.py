@@ -5,14 +5,15 @@ from category_database_setup import Base, Category, StockItem
 from flask import session as login_session
 import random
 import string
-
-# IMPORTS FOR THIS STEP
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
 import json
 from flask import make_response
 import requests
+
+# Imports for Login
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+
 
 
 app = Flask(__name__)
