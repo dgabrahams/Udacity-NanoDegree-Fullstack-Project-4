@@ -253,3 +253,7 @@ a {
 	color: #989898;
 	opacity: 0.9;
 }
+
+.edit-item-buttons a {
+	display: inline-block;
+}

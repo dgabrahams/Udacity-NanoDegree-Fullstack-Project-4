@@ -6,16 +6,18 @@
 			<h3>{{stockItem[0].name}}</h3>
 			<p>{{stockItem[0].description}}</p>
 		</div>
+		<div class="col-md-12 edit-item-buttons">
+				{% if loginStatus['loginStatus'] %}
+					<a href = "{{url_for('editStockItem', stock_name=stockItem[0].name)}}">
+						Edit
+					</a>
+					|
+					<a href = "{{url_for('deleteStockItem', stock_name=stockItem[0].name)}}">
+						Delete
+					</a>
+				{% endif %}
+		</div>
 		<div class="clearfix"></div>
-		{% if loginStatus['loginStatus'] %}
-			<a href = "{{url_for('editStockItem', stock_name=stockItem[0].name)}}">
-				Edit
-			</a>
-			|
-			<a href = "{{url_for('deleteStockItem', stock_name=stockItem[0].name)}}">
-				Delete
-			</a>
-		{% endif %}
 	</div>
 </div>
 {% endblock %}
