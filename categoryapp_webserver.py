@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from category_database_setup import Base, Category, StockItem
 from flask import session as login_session
@@ -17,6 +17,8 @@ import requests
 
 app = Flask(__name__)
 
+# Removes the native functionality of sorting JSON results.
+app.config['JSON_SORT_KEYS'] = False
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -27,17 +29,7 @@ APPLICATION_NAME = "Category Application"
 engine = create_engine('sqlite:///categorylist.db')
 Base.metadata.bind = engine
 
-
-
-
-# DBSession = sessionmaker(bind=engine)
-# session = DBSession()
-
-
-
-
 login_required_message = 'You need to be logged in to access this page.'
-
 
 
 # Create anti-forgery state token
@@ -189,35 +181,16 @@ def templateLoginStatus():
     else:
         return dict(loginStatus=True)
 
-
-
-
-
+# Show home page.
 @app.route('/')
 def showLandingPage():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()  
     categories = session.query(Category).all()
-    stockItem = session.query(StockItem).all()
+    stockItem = session.query(StockItem).order_by(desc(StockItem.id)).limit(9).all()
     return render_template('content_area.html', categories=categories, stockItem=stockItem)
 
-
-
-# JSON APIs to view Category Information
-# @app.route('/catalog/<string:category_name>/items/JSON')
-# def categoryMenuJSON(category_name):
-#     category = session.query(Category).filter_by(name=category_name).one()
-#     items = session.query(StockItem).filter_by(
-#         category_name=category_name).all()
-#     return jsonify(StockItems=[i.serialize for i in items])
-
-
-# @app.route('/catalog/<string:category_name>/items/<string:stock_name>/JSON')
-# def stockItemJSON(category_name, stock_name):
-#     Menu_Item = session.query(StockItem).filter_by(name=stock_name).one()
-#     return jsonify(Menu_Item=Menu_Item.serialize)
-
-
+# Output JSON Feed.
 @app.route('/catalog/JSON')
 def categoriesJSON():
     DBSession = sessionmaker(bind=engine)
@@ -236,14 +209,7 @@ def showCategories():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     categories = session.query(Category).order_by(asc(Category.name))
-    # currentCategory = session.query(Category).filter_by(name=category_name).one()
-
-    # need to add LATEST ITEMS query and results here
-    # get all stock items and order by latest date
-
     return render_template('categories.html', categories=categories)
-
-
 
 
 # Create a new category
@@ -306,11 +272,11 @@ def deleteCategory(category_name):
     else:
         return render_template('deleteCategory.html', category=categoryToDelete)
 
+
 # Show items that belong to a category
 @app.route('/catalog/<string:category_name>/')
 @app.route('/catalog/<string:category_name>/items/')
 def showCategoryItems(category_name):
-
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
@@ -319,9 +285,6 @@ def showCategoryItems(category_name):
     currentCategory = session.query(Category).filter_by(name=category_name).one()
     stockItemsNum = len(stockItems)
     loginStatus = templateLoginStatus()
-    # print loginStatus['loginStatus']
-    # print type(loginStatus)
-    # print 'thing'
     return render_template('content_area_items.html', categories=categories, stockItems=stockItems, currentCategory=currentCategory, stockItemsNum=stockItemsNum, loginStatus=loginStatus)
 
 
@@ -334,16 +297,11 @@ def showStockItem(category_name, stockItem_name):
         name=stockItem_name)
     currentCategory = session.query(Category).filter_by(name=category_name).one()
     loginStatus = templateLoginStatus()
-    # print stockItem[0].name
     return render_template('item_content.html', stockItem=stockItem, loginStatus=loginStatus, currentCategory=currentCategory)
-
-
-
 
 
 # Create a new stock item
 @app.route('/catalog/items/new/', methods=['GET', 'POST'])
-# def newStockItem(category_name):
 def newStockItem():
     # Check the user is logged in to access this page
     if 'username' not in login_session:
@@ -352,32 +310,19 @@ def newStockItem():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    # category = session.query(Category).filter_by(name=category_name).one()
     if request.method == 'POST':
         if request.form['select_value']:
             category_name = request.form['select_value']
-
-            print "cat name:"
-            print category_name
-
             category = session.query(Category).filter_by(name=category_name).one()
-            # newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category_name)
             newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category)
             session.add(newItem)
             session.commit()
-
-            # FLASH MESSGE!
-            flash('New Menu %s Item Successfully Created' % (newItem.name))
-
             return redirect(url_for('showCategoryItems', category_name=category_name))
         else:
             return "sorry"
     else:
         categories = session.query(Category).all()
         return render_template('newStockItem.html', categories=categories)
-
-
-
 
 
 # Edit a stock item
@@ -401,10 +346,8 @@ def editStockItem(stock_name):
             editedItem.price = request.form['select_value']
         session.add(editedItem)
         session.commit()
-        # flash('Menu Item Successfully Edited')
         return redirect(url_for('showCategoryItems', category_name=editedItem.category_name))
     else:
-        # categories = session.query(Category).filter_by(name=category_name).one()
         categories = session.query(Category).all()
         return render_template('editStockitem.html', stock_name=stock_name, stock_item=editedItem, categories=categories)
 
@@ -419,14 +362,11 @@ def deleteStockItem(stock_name):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    # category = session.query(Category).filter_by(name=category_name).one()
     itemToDelete = session.query(StockItem).filter_by(name=stock_name).one()
-    # category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
         print "deleted!"
-        # flash('Menu Item Successfully Deleted')
         category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
         return redirect(url_for('showCategoryItems', category_name=itemToDelete.category_name))
     else:
