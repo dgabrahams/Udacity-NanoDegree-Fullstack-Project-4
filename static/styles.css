@@ -105,6 +105,10 @@ h3 {
 	background-repeat: no-repeat;
 	background-size: cover;
 }*/
+
+
+
+/*
 .banner.menu {
 	height: 150px;
 	background-color: #E1E17F;
@@ -162,6 +166,13 @@ u }
 
 }
 
+*/
+
+
+
+
+
+
 
 
 
@@ -176,8 +187,6 @@ body {
 }
 
 .banner.main {
-	/*height: 150px;*/
-	/*padding: 1em 0 0 0;*/
 	margin: 1em 0 0 0;
 }
 
@@ -193,8 +202,6 @@ h3 {
 a {
 	display: block;
 	margin: 10px 0 0 0;
-/*	color: #c85e3f;
-	color: #d32902;*/
 	color: #c64f17;
 }
 
@@ -209,6 +216,28 @@ a {
 	margin: 20px 0 0 0;
 }
 
+.login-container {
+	margin-top: 1em;
+}
 
+#result {
+	display: inline-block;
+  vertical-align: middle;
+  padding: 0 1em 0 0;
+}
 
+.signin-button {
+	display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  background-color: #c64f17;
+  padding: 0.6em 1em;
+  cursor: pointer;
+	transition: 0.3s;
+}
 
+.signin-button:hover {
+	background-color: #fff;
+	color: #989898;
+	opacity: 0.9;
+}

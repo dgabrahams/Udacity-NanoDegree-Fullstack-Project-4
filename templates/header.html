@@ -3,7 +3,8 @@
 		<div class="col-md-6">
 			<h2>Catalog App</h2>
 		</div>
-		<div class="col-md-6 text-right">
+		<div class="col-md-6 text-right login-container">
+			<div id="result"></div>
 	    <div id="signinButton">
 	      <span class="g-signin"
 	        data-scope="openid email"
@@ -15,8 +16,8 @@
 	        data-approvalprompt="force">
 	      </span>
 	    </div>
-	    <div id="signOutButton" style="display:none;" onclick="logout();return false;">Logout</div>
-		  <div id="result"></div>
+	    <div id="signOutButton" class="signin-button" style="display:none;" onclick="logout();return false;">Logout</div>
+		  
 		</div>
 	</div>
 </div>
@@ -61,10 +62,11 @@ function signInCallback(authResult) {
 		      success: function(result) {
 		        // Handle or verify the server response if necessary.
 		        if (result) {
-		          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+		          // $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...');
+		          $('#result').html('Login Successful! Redirecting...');
 		         setTimeout(function() {
 		          window.location.href = "/";
-		         }, 4000);        
+		         }, 2000);        
 			      } else if (authResult['error']) {
 					    console.log('There was an error: ' + authResult['error']);
 					  } else {
