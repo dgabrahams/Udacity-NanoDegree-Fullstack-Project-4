@@ -71,14 +71,24 @@ Navigate into the newly created 'Udacity-NanoDegree-Fullstack-Project-4' folder:
 cd Udacity-NanoDegree-Fullstack-Project-4
 ```
 
+Create a virtual environment:
+```
+virtualenv categoryapp-workspace
+```
+
 Navigate into the newly the workspace folder:
 ```
-cd sqlalchemy-workspace
+cd categoryapp-workspace
 ```
 
 Activate the Python Virtual environment:
 ```
 source bin/activate
+```
+
+Instal sqlalchemy, flask, requests and oauth2client:
+```
+pip install sqlalchemy flask requests oauth2client
 ```
 
 Navigate back one level:
