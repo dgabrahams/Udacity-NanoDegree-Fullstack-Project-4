@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from category_database_setup import Base, Category, StockItem
+from category_database_setup import Base, Category, StockItem, UserTable
 from flask import session as login_session
 import random
 import string
@@ -42,6 +42,7 @@ def showLogin():
     return state
 
 
+# CONNECT - Generate a current user's token and their login_session
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -110,9 +111,18 @@ def gconnect():
 
     data = answer.json()
 
-    login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
-    login_session['email'] = data['email']
+    login_session['username'] = data.get('name', '')
+    login_session['picture'] = data.get('picture', '')
+    login_session['email'] = data.get('email', '')
+
+    # DBSession = sessionmaker(bind=engine)
+    # session = DBSession()
+
+    # Add logged in user to the DB
+    # TODO: It might be more efficient to simply use the login_session variable rather than write to the DB
+    #       The logged in users are removed form the Db and each created item has the creator's email address.
+    #       So when a user logs in, just check the current login_session value if it matches creator value.
+    # session.add(UserTable(email = data['email']))
 
     output = ''
     output += '<h1>Welcome, '
@@ -149,6 +159,13 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
+
+        # DBSession = sessionmaker(bind=engine)
+        # session = DBSession()
+        # userToDelete = session.query(UserTable).filter_by(email=login_session['email']).one()
+        # session.delete(userToDelete)
+        # session.commit()
+
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -198,6 +215,21 @@ def categoriesJSON():
     session = DBSession()
     categories = session.query(Category).all()
     return jsonify(categories=[r.serialize for r in categories])
+
+
+# NOT NEEDED!!!!???!!!!!????????????????????????????????????????????????????
+# Output JSON Feed.
+@app.route('/users/JSON')
+def usersJSON():
+
+    # Check the user is logged in to access this page
+    if 'username' not in login_session:
+        return login_required_message
+
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    users = session.query(UserTable).all()
+    return jsonify(loggedInUsers=[r.serialize for r in users])
 
 
 # Show all categories
@@ -254,7 +286,7 @@ def newStockItem():
         if request.form['select_value']:
             category_name = request.form['select_value']
             category = session.query(Category).filter_by(name=category_name).one()
-            newItem = StockItem(name=request.form['name'], description=request.form['description'], category=category)
+            newItem = StockItem(name=request.form['name'], description=request.form['description'], created_by=login_session['email'], category=category)
             session.add(newItem)
             session.commit()
             return redirect(url_for('showCategoryItems', category_name=category_name))
@@ -277,16 +309,22 @@ def editStockItem(stock_name):
 
     editedItem = session.query(StockItem).filter_by(name=stock_name).one()
     category = session.query(Category).filter_by(name=editedItem.category_name).one()
+    createdBy = editedItem.created_by
     if request.method == 'POST':
-        if request.form['name']:
-            editedItem.name = request.form['name']
-        if request.form['description']:
-            editedItem.description = request.form['description']
-        if request.form['select_value']:
-            editedItem.price = request.form['select_value']
-        session.add(editedItem)
-        session.commit()
-        return redirect(url_for('showCategoryItems', category_name=editedItem.category_name))
+        if login_session['email'] == createdBy:
+            if request.form['name']:
+                editedItem.name = request.form['name']
+            if request.form['description']:
+                editedItem.description = request.form['description']
+            if request.form['select_value']:
+
+                ##### REFACTOR THIS!!!!!!!! IT MIGHT NOT WORK!
+                editedItem.price = request.form['select_value']
+            session.add(editedItem)
+            session.commit()
+            return redirect(url_for('showCategoryItems', category_name=editedItem.category_name))
+        else:
+            return 'Sorry, only the user that created this item can edit it.'
     else:
         categories = session.query(Category).all()
         return render_template('editStockitem.html', stock_name=stock_name, stock_item=editedItem, categories=categories)

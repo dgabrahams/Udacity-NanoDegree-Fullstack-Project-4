@@ -8,16 +8,16 @@
 
 			<form action="{{url_for('newStockItem', category_name = category_name)}}" method="POST" class="add-item-form">
 			  <span>Title:</span>
-			  <input type="text" name="name">
+			  <input type="text" name="name" required>
 			  <span>Description:</span>
-			  <input type="text" name="description">
+			  <input type="text" name="description" required>
 			  <span>Category:</span>
-				<select name="select_value">
+				<select name="select_value" required>
 					{% for category in categories %}
 								<option value="{{category.name}}">{{category.name}}</option>
 					{% endfor %}
 				</select>
-			  <input type="submit" value="Submit" class="add-submit-button">
+			  <input type="submit" value="Submit" class="add-submit-button" required>
 			</form>
 
 		</div>

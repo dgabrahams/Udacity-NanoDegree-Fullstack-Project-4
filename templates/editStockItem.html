@@ -7,7 +7,7 @@
 			<h3>Edit Item</h3>
 			<form action="{{url_for('editStockItem', category_name=category_name, stock_name=stock_name)}}" method="POST" class="add-item-form">
 			  <span>Title:</span>
-			  <input type="text" name="name" value="{{stock_item.name}}">
+			  <input type="text" name="name" value="{{stock_item.name}}" required>
 			  <span>Description:</span>
 			  <textarea maxlength="250" rows="3" name="description">{{stock_item.description}}</textarea>
 			  <span>Category:</span>
@@ -20,7 +20,7 @@
 						{% endif %}
 					{% endfor %}
 				</select>
-			  <input type="submit" value="Submit" class="add-submit-button">
+			  <input type="submit" value="Submit" class="add-submit-button" required>
 			</form>
 
 		</div>
