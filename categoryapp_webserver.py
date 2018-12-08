@@ -214,6 +214,7 @@ def showLandingPage():
     stockItem = session.query(StockItem).order_by(desc(StockItem.id)).limit(9).all()
     return render_template('content_area.html', categories=categories, stockItem=stockItem)
 
+
 # Output JSON Feed.
 @app.route('/catalog/JSON')
 def categoriesJSON():
@@ -223,19 +224,14 @@ def categoriesJSON():
     return jsonify(categories=[r.serialize for r in categories])
 
 
-# NOT NEEDED!!!!???!!!!!????????????????????????????????????????????????????
-# Output JSON Feed.
-@app.route('/users/JSON')
-def usersJSON():
-
-    # Check the user is logged in to access this page
-    if 'username' not in login_session:
-        return login_required_message
-
+# WORKS - http://localhost:8000/catalog/Baseball/items/Bat/JSON
+# Case sensitive on the stock and category names.
+@app.route('/catalog/<string:category_name>/items/<string:stock_name>/JSON')
+def stockItemJSON(category_name, stock_name):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    users = session.query(UserTable).all()
-    return jsonify(loggedInUsers=[r.serialize for r in users])
+    stock_item = session.query(StockItem).filter_by(name=stock_name).one()
+    return jsonify(single_stock_item=stock_item.serialize)
 
 
 # Show all categories

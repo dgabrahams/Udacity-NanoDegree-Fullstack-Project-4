@@ -47,24 +47,5 @@ class StockItem(Base):
             'category_name': self.category_name
         }
 
-class UserTable(Base):
-    __tablename__ = 'user_table'
-
-    email = Column(String(80), nullable=False)
-    id = Column(Integer, primary_key=True)
-
-    @property
-    def serialize(self):
-
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        allResults = session.query(UserTable).all()
-        loggedInUsers = [r.serialize for r in allResults]
-
-        return {
-            'loggedInUsers': loggedInUsers
-        }
-
-
 engine = create_engine('sqlite:///categorylist.db')
 Base.metadata.create_all(engine)
