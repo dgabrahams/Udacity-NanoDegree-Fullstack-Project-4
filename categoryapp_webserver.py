@@ -7,7 +7,7 @@ from flask import (Flask,
                    flash)
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from category_database_setup import Base, Category, StockItem, UserTable
+from category_database_setup import Base, Category, StockItem
 from flask import session as login_session
 import random
 import string
