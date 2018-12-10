@@ -293,7 +293,7 @@ def newStockItem():
             session.commit()
             return redirect(url_for('showCategoryItems', category_name=category_name))
         else:
-            return "sorry"
+            return "Sorry, no value for category was found."
     else:
         categories = session.query(Category).all()
         return render_template('newStockItem.html', categories=categories)
@@ -343,12 +343,16 @@ def deleteStockItem(stock_name):
     session = DBSession()
 
     itemToDelete = session.query(StockItem).filter_by(name=stock_name).one()
+    createdBy = itemToDelete.created_by
     if request.method == 'POST':
-        session.delete(itemToDelete)
-        session.commit()
-        print "deleted!"
-        category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
-        return redirect(url_for('showCategoryItems', category_name=itemToDelete.category_name))
+        if login_session['email'] == createdBy:
+            session.delete(itemToDelete)
+            session.commit()
+            print "deleted!"
+            category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
+            return redirect(url_for('showCategoryItems', category_name=itemToDelete.category_name))
+        else:
+            return 'Sorry, only the user that created this item can edit it.'
     else:
         return render_template('deleteStockItem.html', stock_name=stock_name)
 
