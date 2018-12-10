@@ -21,7 +21,6 @@ from oauth2client.client import FlowExchangeError
 import httplib2
 
 
-
 app = Flask(__name__)
 
 # Removes the native functionality of sorting JSON results.
@@ -101,8 +100,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('User is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -125,9 +123,12 @@ def gconnect():
     # session = DBSession()
 
     # Add logged in user to the DB
-    # TODO: It might be more efficient to simply use the login_session variable rather than write to the DB
-    #       The logged in users are removed form the Db and each created item has the creator's email address.
-    #       So when a user logs in, just check the current login_session value if it matches creator value.
+    # TODO: It might be more efficient to simply use the login_session
+    #       variable rather than write to the DB. The logged in users
+    #       are removed form the Db and each created item has the
+    #       creator's email address. So when a user logs in, just
+    #       check the current login_session value if it matches creator
+    #       value.
     # session.add(UserTable(email = data['email']))
 
     output = ''
@@ -136,9 +137,6 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
     return output
 
 
@@ -148,13 +146,14 @@ def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('User not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print 'In gdisconnect access token is %s', access_token
     print 'User name is: '
     print login_session['username']
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'
+    url = url % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -166,17 +165,12 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
 
-        # DBSession = sessionmaker(bind=engine)
-        # session = DBSession()
-        # userToDelete = session.query(UserTable).filter_by(email=login_session['email']).one()
-        # session.delete(userToDelete)
-        # session.commit()
-
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = 'Failed to revoke token for given user.'
+        response = make_response(json.dumps(response, 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -187,7 +181,7 @@ def checkLoginStatus():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 200)
+        response = make_response(json.dumps('User not connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
@@ -205,14 +199,18 @@ def templateLoginStatus():
     else:
         return dict(loginStatus=True)
 
+
 # Show home page.
 @app.route('/')
 def showLandingPage():
     DBSession = sessionmaker(bind=engine)
-    session = DBSession()  
+    session = DBSession()
     categories = session.query(Category).all()
-    stockItem = session.query(StockItem).order_by(desc(StockItem.id)).limit(9).all()
-    return render_template('content_area.html', categories=categories, stockItem=stockItem)
+    stockItem = session.query(StockItem)
+    stockItem = stockItem.order_by(desc(StockItem.id)).limit(9).all()
+    return render_template('content_area.html',
+                           categories=categories,
+                           stockItem=stockItem)
 
 
 # Output JSON Feed.
@@ -255,11 +253,18 @@ def showCategoryItems(category_name):
     session = DBSession()
 
     categories = session.query(Category)
-    stockItems = session.query(StockItem).filter_by(category_name=category_name).all()
-    currentCategory = session.query(Category).filter_by(name=category_name).one()
+    stockItems = session.query(StockItem)
+    stockItems = stockItems.filter_by(category_name=category_name).all()
+    currentCategory = session.query(Category)
+    currentCategory = currentCategory.filter_by(name=category_name).one()
     stockItemsNum = len(stockItems)
     loginStatus = templateLoginStatus()
-    return render_template('content_area_items.html', categories=categories, stockItems=stockItems, currentCategory=currentCategory, stockItemsNum=stockItemsNum, loginStatus=loginStatus)
+    return render_template('content_area_items.html',
+                           categories=categories,
+                           stockItems=stockItems,
+                           currentCategory=currentCategory,
+                           stockItemsNum=stockItemsNum,
+                           loginStatus=loginStatus)
 
 
 # Show a category item
@@ -269,9 +274,13 @@ def showStockItem(category_name, stockItem_name):
     session = DBSession()
     stockItem = session.query(StockItem).filter_by(
         name=stockItem_name)
-    currentCategory = session.query(Category).filter_by(name=category_name).one()
+    currentCategory = session.query(Category)
+    currentCategory = currentCategory.filter_by(name=category_name).one()
     loginStatus = templateLoginStatus()
-    return render_template('item_content.html', stockItem=stockItem, loginStatus=loginStatus, currentCategory=currentCategory)
+    return render_template('item_content.html',
+                           stockItem=stockItem,
+                           loginStatus=loginStatus,
+                           currentCategory=currentCategory)
 
 
 # Create a new stock item
@@ -287,11 +296,16 @@ def newStockItem():
     if request.method == 'POST':
         if request.form['select_value']:
             category_name = request.form['select_value']
-            category = session.query(Category).filter_by(name=category_name).one()
-            newItem = StockItem(name=request.form['name'], description=request.form['description'], created_by=login_session['email'], category=category)
+            category = session.query(Category)
+            category = category.filter_by(name=category_name).one()
+            newItem = StockItem(name=request.form['name'],
+                                description=request.form['description'],
+                                created_by=login_session['email'],
+                                category=category)
             session.add(newItem)
             session.commit()
-            return redirect(url_for('showCategoryItems', category_name=category_name))
+            return redirect(url_for('showCategoryItems',
+                                    category_name=category_name))
         else:
             return "Sorry, no value for category was found."
     else:
@@ -310,7 +324,8 @@ def editStockItem(stock_name):
     session = DBSession()
 
     editedItem = session.query(StockItem).filter_by(name=stock_name).one()
-    category = session.query(Category).filter_by(name=editedItem.category_name).one()
+    category = session.query(Category)
+    category = category.filter_by(name=editedItem.category_name).one()
     createdBy = editedItem.created_by
     if request.method == 'POST':
         if login_session['email'] == createdBy:
@@ -320,16 +335,20 @@ def editStockItem(stock_name):
                 editedItem.description = request.form['description']
             if request.form['select_value']:
 
-                ##### REFACTOR THIS!!!!!!!! IT MIGHT NOT WORK!
+                # REFACTOR THIS!!!!!!!! IT MIGHT NOT WORK!
                 editedItem.price = request.form['select_value']
             session.add(editedItem)
             session.commit()
-            return redirect(url_for('showCategoryItems', category_name=editedItem.category_name))
+            return redirect(url_for('showCategoryItems',
+                                    category_name=editedItem.category_name))
         else:
             return 'Sorry, only the user that created this item can edit it.'
     else:
         categories = session.query(Category).all()
-        return render_template('editStockitem.html', stock_name=stock_name, stock_item=editedItem, categories=categories)
+        return render_template('editStockitem.html',
+                               stock_name=stock_name,
+                               stock_item=editedItem,
+                               categories=categories)
 
 
 # Delete a stock item
@@ -342,15 +361,17 @@ def deleteStockItem(stock_name):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    itemToDelete = session.query(StockItem).filter_by(name=stock_name).one()
-    createdBy = itemToDelete.created_by
+    delete = session.query(StockItem).filter_by(name=stock_name).one()
+    createdBy = delete.created_by
     if request.method == 'POST':
         if login_session['email'] == createdBy:
-            session.delete(itemToDelete)
+            session.delete(delete)
             session.commit()
             print "deleted!"
-            category = session.query(Category).filter_by(name=itemToDelete.category_name).one()
-            return redirect(url_for('showCategoryItems', category_name=itemToDelete.category_name))
+            category = session.query(Category)
+            category = category.filter_by(name=delete.category_name).one()
+            return redirect(url_for('showCategoryItems',
+                                    category_name=delete.category_name))
         else:
             return 'Sorry, only the user that created this item can edit it.'
     else:
@@ -361,4 +382,3 @@ if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
-
